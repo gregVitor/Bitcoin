@@ -11,9 +11,13 @@ class UserRepository
      */
     private $user;
 
+    /**
+     * Class constructor method.
+     *
+     * @param User $user
+     */
     public function __construct(
         User $user
-
     ) {
         $this->user = $user;
     }
