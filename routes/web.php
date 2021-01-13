@@ -26,6 +26,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
     $router->group(['middleware' => 'auth'], function () use ($router) {
         $router->group(['prefix' => 'account'], function () use ($router) {
             $router->post('deposit', 'Transactions\BankAccountController@createAccountDeposit');
+            $router->get('balance', 'Transactions\BankAccountController@getBalance');
         });
     });
 

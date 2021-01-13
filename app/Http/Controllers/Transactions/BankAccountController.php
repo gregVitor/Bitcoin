@@ -57,4 +57,27 @@ class BankAccountController extends Controller
             throw ($e);
         }
     }
+
+    /**
+     * Function get user account balance
+     *
+     * @param Request $request
+     *
+     * @return void
+     */
+    public function getBalance(Request $request)
+    {
+        try {
+            $balance = $this->bankAccountRepository->getBalance($request->user->id);
+
+            $data = [
+                'balance' => $balance
+            ];
+
+            return apiResponse("Ok.", 200, $data);
+        } catch (\Exception $e) {
+            throw ($e);
+        }
+
+    }
 }
