@@ -52,9 +52,11 @@ class BankAccountRepository
 
         $balance = $this->getBalance($userId);
 
-        $data = [
+        $data = (object)[
+            'id' => $deposit->id,
             'deposit' => $deposit->amount,
-            'balance' => $balance
+            'balance' => $balance,
+            'created_at' => date('Y-m-d H:i:s', strtotime($deposit->created_at)),
         ];
 
         return $data;
