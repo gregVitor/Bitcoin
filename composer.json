@@ -24,7 +24,8 @@
         },
         "files": [
             "app/Helpers/Hash.php",
-            "app/Helpers/Response.php"
+            "app/Helpers/Response.php",
+            "app/Helpers/Request.php"
         ]
 
     },

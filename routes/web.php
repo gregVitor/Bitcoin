@@ -28,6 +28,10 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->post('deposit', 'Transactions\BankAccountController@createAccountDeposit');
             $router->get('balance', 'Transactions\BankAccountController@getBalance');
         });
+
+        $router->group(['prefix' => 'btc'], function () use ($router) {
+            $router->get('price', 'Bitcoin\BitcoinController@getPrice');
+        });
     });
 
 });
