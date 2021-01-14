@@ -55,6 +55,9 @@ class Handler extends ExceptionHandler
                   $request,
         Throwable $exception
     ) {
+        $code = $exception->getCode();
+        $message = $exception->getMessage();
+
         if ($exception instanceof ValidationException) {
             return $this->handleValidationMessage($exception);
         }
@@ -83,7 +86,6 @@ class Handler extends ExceptionHandler
             $message = $exception->getMessage();
         }
 
-        $message = $exception->getMessage();
         if (empty($code)) {
             $code = 500;
         }
