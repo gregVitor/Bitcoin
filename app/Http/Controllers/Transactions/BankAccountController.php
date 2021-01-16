@@ -59,7 +59,6 @@ class BankAccountController extends Controller
             $balance = $this->bankAccountService->createAccountDeposit($request->user, $request->amount);
 
             return apiResponse("Valor depositado em conta.", 200, $balance);
-
         } catch (\Exception $e) {
             throw ($e);
         }
@@ -85,6 +84,39 @@ class BankAccountController extends Controller
         } catch (\Exception $e) {
             throw ($e);
         }
+    }
 
+    /**
+     * Function get extract
+     *
+     * @param Request $request
+     *
+     * @return void
+     */
+    public function getExtract(Request $request)
+    {
+        try {
+            $data      = (object) [];
+            $paginator = (object) [];
+
+            if (isset($request->initial_date)) {
+                $data->initial_date = $request->initial_date;
+            }
+            if (isset($request->final_date)) {
+                $data->final_date = $request->final_date;
+            }
+            if (isset($request->per_page)) {
+                $paginator->per_page = $request->per_page;
+            }
+            if (isset($request->page)) {
+                $paginator->page = $request->page;
+            }
+
+            $extract = $this->bankAccountRepository->getExtract($request->user->id, $data, $paginator);
+
+            return apiResponse("Ok.", 200, $extract);
+        } catch (\Exception $e) {
+            throw ($e);
+        }
     }
 }

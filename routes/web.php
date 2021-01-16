@@ -27,6 +27,8 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
         $router->group(['prefix' => 'account'], function () use ($router) {
             $router->post('deposit', 'Transactions\BankAccountController@createAccountDeposit');
             $router->get('balance', 'Transactions\BankAccountController@getBalance');
+            $router->get('extract', 'Transactions\BankAccountController@getExtract');
+
         });
 
         $router->group(['prefix' => 'btc'], function () use ($router) {

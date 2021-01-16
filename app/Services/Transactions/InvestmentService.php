@@ -115,7 +115,7 @@ class InvestmentService
             "liquidated_at"    => null != $investment->deleted_at ? date('Y-m-d H:i:s', strtotime($investment->deleted_at)) : null
         ];
 
-        $this->bankAccountRepository->investmentAccount($userId, $appliedMoney * -1, true == $reinvest ? 'reinvest_buy_bitcoin' : 'buy_bitcoin');
+        $this->bankAccountRepository->investmentAccount($userId, $appliedMoney * -1, true == $reinvest ? 'reinvest_buy_bitcoin' : 'investment');
 
         return $investmentData;
     }
@@ -182,7 +182,7 @@ class InvestmentService
             $balance             = $investment->bitcoin_quantity - $quantityBitcoinSell;
             $quantityBitcoinSell = $balance * (-1); //$quantityBitcoinSell - $investment->bitcoin_quantity;
 
-            $this->bankAccountRepository->createAccountDeposit($user->id, $amount, 'sell_bitcoin');
+            $this->bankAccountRepository->createAccountDeposit($user->id, $amount, 'liquidation');
 
             if ($quantityBitcoinSell <= 0) {
                 $deletedInvestment = $this->investmentRepository->sellInvestment($investment->id);

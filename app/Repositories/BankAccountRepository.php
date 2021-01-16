@@ -47,8 +47,8 @@ class BankAccountRepository
      * @return object
      */
     public function createAccountDeposit(
-        int   $userId,
-        float $amount,
+        int    $userId,
+        float  $amount,
         string $type = 'deposit'
     ) {
         $deposit = $this->createTransactionAccount($userId, $type, $amount);
@@ -105,5 +105,67 @@ class BankAccountRepository
         $deposit = $this->createTransactionAccount($userId, $type, $amount);
 
         return $deposit;
+    }
+
+    /**
+     * Function get Extract to filter
+     *
+     * @param integer $userId
+     * @param object $data
+     * @param object $paginator
+     *
+     * @return void
+     */
+    public function getExtract(
+        int    $userId,
+        object $data = null,
+        object $paginator = null
+    ) {
+
+        $bankAccounts = $this->bankAccount->where('user_id', $userId);
+
+        if (isset($data->initial_date)) {
+            $bankAccounts = $bankAccounts->whereDate('created_at', '>=', date('Y-m-d', strtotime($data->initial_date)));
+        } else {
+            $bankAccounts = $bankAccounts->whereDate('created_at', '>=', date('Y-m-d', strtotime('- 90 days')));
+        }
+
+        if (isset($data->final_date)) {
+            $bankAccounts = $bankAccounts->whereDate('created_at', '<=', date('Y-m-d', strtotime($data->final_date)));
+        }
+
+        if (!empty($paginator->per_page)) {
+            $bankAccounts = $bankAccounts->paginate($paginator->per_page, ['*'], 'page', $paginator->page);
+        } else {
+            $bankAccounts = $bankAccounts->get();
+        }
+
+        $dataReturn = [];
+        foreach ($bankAccounts as $bankAccount) {
+            $data = (object) [
+                'id'         => hashEncodeId($bankAccount->id),
+                'amount'     => $bankAccount->amount,
+                'type'       => $bankAccount->type,
+                'created_at' => date('Y-m-d H:i', strtotime($bankAccount->created_at))
+            ];
+
+            $dataReturn[] = $data;
+        }
+
+        $arrayReturn = ['data' => $dataReturn];
+
+        if (!empty($paginator->per_page)) {
+            $paginate = [
+                'total'             => $bankAccounts->total(),
+                'current_page'      => $bankAccounts->currentPage(),
+                'last_page'         => $bankAccounts->lastPage(),
+                'per_page'          => $bankAccounts->perPage(),
+                'next_page_url'     => $bankAccounts->nextPageUrl(),
+                'previous_page_url' => $bankAccounts->previousPageUrl()
+            ];
+            $arrayReturn['paginate'] = $paginate;
+        }
+
+        return $arrayReturn;
     }
 }
