@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\UserRepository;
+use App\Validators\AuthValidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,14 +17,22 @@ class AuthController extends Controller
     private $userRepository;
 
     /**
+     * @var AuthValidator
+     */
+    private $authValidator;
+
+    /**
      * Class constructor method.
      *
      * @param UserRepository $userRepository
+     * @param AuthValidator $authValidator
      */
     public function __construct(
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        AuthValidator  $authValidator
     ) {
         $this->userRepository = $userRepository;
+        $this->authValidator  = $authValidator;
     }
 
     /**
@@ -35,13 +44,7 @@ class AuthController extends Controller
     public function registerUser(Request $request)
     {
         try {
-
-            //Validator
-            $this->validate($request, [
-                'name'     => 'required|string',
-                'email'    => 'required|email|unique:users',
-                'password' => 'required|string'
-            ]);
+            $this->authValidator->validateRegisterUser($request->all());
 
             $user = $this->userRepository->registerUser($request);
 
@@ -66,11 +69,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         try {
-            //Validator
-            $this->validate($request, [
-                'email'    => 'required|string',
-                'password' => 'required|string'
-            ]);
+            $this->authValidator->validateLogin($request->all());
 
             $credentials = $request->only(['email', 'password']);
 
@@ -80,7 +79,7 @@ class AuthController extends Controller
 
             $data = [
                 'access_token' => $token,
-                'token_type' => 'bearer',
+                'token_type'   => 'bearer',
                 'expires_in'   => Auth::factory()->getTTL() * 60
             ];
 

@@ -54,28 +54,28 @@ class InvestmentService
      * Function create purchase
      *
      * @param object $user
-     * @param array $values
+     * @param object $values
      *
      * @return object
      */
     public function createPurchase(
         object $user,
-        array  $values
+        object  $values
     ) {
         $balance      = $this->bankAccountRepository->getBalance($user->id);
         $bitcoinPrice = $this->bitcoinService->getPrice();
 
-        if (!empty($values['amount'])) {
-            if ($values['amount'] > $balance) {
+        if (!empty($values->amount)) {
+            if ($values->amount > $balance) {
                 abort(400, "Saldo insuficente, operação requer um investimento menor ou igual ao seu saldo em conta.");
             }
-            $bitcoinUnits = $values['amount'] / $bitcoinPrice->buy;
-            $appliedMoney = $values['amount'];
-        } elseif ($balance < ($bitcoinPrice->buy * $values['units'])) {
+            $bitcoinUnits = $values->amount / $bitcoinPrice->buy;
+            $appliedMoney = $values->amount;
+        } elseif ($balance < ($bitcoinPrice->buy * $values->units)) {
             abort(400, "Saldo insuficente, operação requer um investimento menor ou igual ao seu saldo em conta.");
         } else {
-            $bitcoinUnits = $values['units'];
-            $appliedMoney = $bitcoinPrice->buy * $values['units'];
+            $bitcoinUnits = $values->units;
+            $appliedMoney = $bitcoinPrice->buy * $values->units;
         }
 
         $investment = $this->createInvestment($user->id, $bitcoinUnits, $bitcoinPrice->buy, $appliedMoney);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Transactions;
 use App\Http\Controllers\Controller;
 use App\Repositories\BankAccountRepository;
 use App\Services\Transactions\BankAccountService;
+use App\Validators\BankAccountValidator;
 use Illuminate\Http\Request;
 
 class BankAccountController extends Controller
@@ -21,16 +22,25 @@ class BankAccountController extends Controller
     private $bankAccountService;
 
     /**
+     * @var BankAccountValidator
+     */
+    private $bankAccountValidator;
+
+    /**
      * Class constructor method.
      *
      * @param BankAccountRepository $bankAccountRepository
+     * @param BankAccountService $bankAccountService
+     * @param BankAccountValidator $bankAccountValidator
      */
     public function __construct(
         BankAccountRepository $bankAccountRepository,
-        BankAccountService    $bankAccountService
+        BankAccountService    $bankAccountService,
+        BankAccountValidator  $bankAccountValidator
     ) {
         $this->bankAccountRepository = $bankAccountRepository;
         $this->bankAccountService    = $bankAccountService;
+        $this->bankAccountValidator  = $bankAccountValidator;
     }
 
     /**
@@ -44,10 +54,7 @@ class BankAccountController extends Controller
     {
         try {
 
-            //Validator
-            $this->validate($request, [
-                'amount' => 'required|numeric|not_in:0|min:0'
-            ]);
+            $this->bankAccountValidator->createAccountDeposit($request->all());
 
             $balance = $this->bankAccountService->createAccountDeposit($request->user, $request->amount);
 

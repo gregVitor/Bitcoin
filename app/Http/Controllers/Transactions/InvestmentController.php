@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Transactions;
 
 use App\Http\Controllers\Controller;
 use App\Services\Transactions\InvestmentService;
+use App\Validators\InvestmentValidator;
 use Illuminate\Http\Request;
 
 class InvestmentController extends Controller
@@ -13,10 +14,17 @@ class InvestmentController extends Controller
      */
     private $investmentService;
 
+    /**
+     * @var InvestmentValidator
+     */
+    private $investmentValidator;
+
     public function __construct(
-        InvestmentService $investmentService
+        InvestmentService $investmentService,
+        InvestmentValidator $investmentValidator
     ) {
         $this->investmentService = $investmentService;
+        $this->investmentValidator = $investmentValidator;
     }
 
     /**
@@ -28,14 +36,15 @@ class InvestmentController extends Controller
      */
     public function createPurchase(Request $request)
     {
-        //Validator
-        $values = $this->validate($request, [
-            'amount' => (!isset($request['units']) ? 'required|' : '') . '|numeric|not_in:0|min:0',
-            'units'  => (!isset($request['amount']) ? 'required|' : '') . '|numeric|not_in:0|min:0'
-        ]);
+        $this->investmentValidator->createPurchase($request->all());
 
-        if (isset($values['amount']) && isset($values['units'])) {
-            abort(400, "Requisição inválida");
+        $values = (object)[];
+
+        if(isset($request->amount)){
+            $values->amount = $request->amount;
+        }
+        if(isset($request->units)){
+            $values->units = $request->units;
         }
 
         $investement = $this->investmentService->createPurchase($request->user, $values);
