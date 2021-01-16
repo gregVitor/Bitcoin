@@ -58,10 +58,41 @@ class InvestmentRepository
      *
      * @return Investment
      */
-    public function getInvestments(int $userId){
+    public function getInvestments(int $userId)
+    {
         $investments = $this->investment->where('user_id', $userId)->get();
 
         return $investments;
+    }
+
+    /**
+     * Function return investment for delete
+     *
+     * @param integer $investmentId
+     *
+     * @return Investment
+     */
+    public function sellInvestment(int $investmentId)
+    {
+        $investment = $this->investment->where('id', $investmentId)->first();
+
+        $this->deleteInvestment($investmentId);
+
+        return $investment;
+    }
+
+    /**
+     * Function delete investment
+     *
+     * @param integer $investmentId
+     *
+     * @return Investment
+     */
+    private function deleteInvestment(int $investmentId)
+    {
+        $investment = $this->investment->where('id', $investmentId)->delete();
+
+        return $investment;
     }
 
 }

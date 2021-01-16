@@ -91,6 +91,7 @@ class InvestmentService
      * @param float $bitcoinUnits
      * @param float $bitcoinPrice
      * @param float $appliedMoney
+     * @param bool  $reinvest
      *
      * @return object
      */
@@ -98,7 +99,9 @@ class InvestmentService
         int   $userId,
         float $bitcoinUnits,
         float $bitcoinPrice,
-        float $appliedMoney
+        float $appliedMoney,
+        bool  $reinvest = false
+
     ) {
         $investment = $this->investmentRepository->createInvestment($userId, $bitcoinUnits, $bitcoinPrice, $appliedMoney);
 
@@ -112,7 +115,7 @@ class InvestmentService
             "liquidated_at"    => null != $investment->deleted_at ? date('Y-m-d H:i:s', strtotime($investment->deleted_at)) : null
         ];
 
-        $this->bankAccountRepository->investmentAccount($userId, $appliedMoney * -1);
+        $this->bankAccountRepository->investmentAccount($userId, $appliedMoney * -1, true == $reinvest ? 'reinvest_buy_bitcoin' : 'buy_bitcoin');
 
         return $investmentData;
     }
@@ -127,7 +130,7 @@ class InvestmentService
     public function getInvestmentsPositions(int $userId)
     {
         $bitcoinPrice = $this->bitcoinService->getPrice();
-        $investments = $this->investmentRepository->getInvestments($userId);
+        $investments  = $this->investmentRepository->getInvestments($userId);
 
         $dataReturn = [];
 
@@ -142,7 +145,7 @@ class InvestmentService
                 "sell_amount"          => $investment->bitcoin_quantity * $bitcoinPrice->sell,
                 "variation_amount"     => $bitcoinPrice->buy - $investment->bitcoin_price,
                 "variation_percentage" => $percentageAmount - 100,
-                "purchasedDate"        => date('Y-m-d H:i:s', strtotime($investment->created_at)),
+                "purchased_date"       => date('Y-m-d H:i:s', strtotime($investment->created_at)),
                 "bitcoin"              => (object) [
                     "current_price_buy"  => $bitcoinPrice->buy,
                     "current_price_sell" => $bitcoinPrice->sell
@@ -153,5 +156,49 @@ class InvestmentService
         }
 
         return $dataReturn;
+    }
+
+    /**
+     * Function to sell bitcoin and Rescued Money for bank account
+     *
+     * @param object $user
+     * @param float $amount
+     *
+     * @return bool
+     */
+    public function sellBitcoin(
+        object $user,
+        float  $amount
+    ) {
+        $bitcoinPrice        = $this->bitcoinService->getPrice();
+        $investments         = $this->investmentRepository->getInvestments($user->id);
+        $quantityBitcoinSell = $amount / $bitcoinPrice->sell;
+
+        if ($investments->sum('bitcoin_quantity') < $quantityBitcoinSell) {
+            abort(403, 'Você não possui bitcoins sufientes para essa ação');
+        }
+
+        foreach ($investments as $investment) {
+            $balance             = $investment->bitcoin_quantity - $quantityBitcoinSell;
+            $quantityBitcoinSell = $balance * (-1); //$quantityBitcoinSell - $investment->bitcoin_quantity;
+
+            $this->bankAccountRepository->createAccountDeposit($user->id, $amount, 'sell_bitcoin');
+
+            if ($quantityBitcoinSell <= 0) {
+                $deletedInvestment = $this->investmentRepository->sellInvestment($investment->id);
+                $newAmount         = $deletedInvestment->bitcoin_price * $balance;
+
+                $this->bankAccountRepository->investmentAccount($user->id, $newAmount, 'partial_draft');
+                $this->createInvestment($user->id, $balance, $deletedInvestment->bitcoin_price, $newAmount, true);
+
+                break;
+            } else {
+                $this->investmentRepository->sellInvestment($investment->id);
+            }
+        }
+
+        $this->emailService->sendEmailCreateSellBitcoin($user, $amount / $bitcoinPrice->sell, $amount);
+
+        return true;
     }
 }

@@ -35,6 +35,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         $router->group(['prefix' => 'investment'], function () use ($router) {
             $router->post('purchase', 'Transactions\InvestmentController@createPurchase');
+            $router->post('sell', 'Transactions\InvestmentController@createSellInvestment');
             $router->get('position', 'Transactions\InvestmentController@getInvestmentsPositions');
         });
     });

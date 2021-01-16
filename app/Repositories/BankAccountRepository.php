@@ -42,14 +42,16 @@ class BankAccountRepository
      *
      * @param integer $userId
      * @param float $amount
+     * @param string $type
      *
      * @return object
      */
     public function createAccountDeposit(
         int   $userId,
-        float $amount
+        float $amount,
+        string $type = 'deposit'
     ) {
-        $deposit = $this->createTransactionAccount($userId, 'deposit', $amount);
+        $deposit = $this->createTransactionAccount($userId, $type, $amount);
 
         $balance = $this->getBalance($userId);
 
@@ -96,10 +98,11 @@ class BankAccountRepository
      * @return BankAccount
      */
     public function investmentAccount(
-        int   $userId,
-        float $amount
+        int    $userId,
+        float  $amount,
+        string $type
     ) {
-        $deposit = $this->createTransactionAccount($userId, 'buy_bitcoin', $amount);
+        $deposit = $this->createTransactionAccount($userId, $type, $amount);
 
         return $deposit;
     }

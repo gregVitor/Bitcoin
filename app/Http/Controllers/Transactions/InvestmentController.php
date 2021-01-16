@@ -32,11 +32,11 @@ class InvestmentController extends Controller
      *
      * @param Request $request
      *
-     * @return void
+     * @return array
      */
     public function createPurchase(Request $request)
     {
-        $this->investmentValidator->createPurchase($request->all());
+        $this->investmentValidator->validateCreatePurchase($request->all());
 
         $values = (object) [];
 
@@ -57,7 +57,7 @@ class InvestmentController extends Controller
      *
      * @param Request $request
      *
-     * @return void
+     * @return array
      */
     public function getInvestmentsPositions(Request $request)
     {
@@ -68,5 +68,21 @@ class InvestmentController extends Controller
         } catch (\Exception $e) {
             throw ($e);
         }
+    }
+
+    /**
+     * Function sell investment
+     *
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function createSellInvestment(Request $request)
+    {
+        $this->investmentValidator->validateCreateSellInvestment($request->all());
+
+        $sell = $this->investmentService->sellBitcoin($request->user, $request->amount);
+
+        return apiResponse("Ok.", 200, $sell);
     }
 }

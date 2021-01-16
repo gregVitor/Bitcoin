@@ -12,7 +12,7 @@ class InvestmentValidator extends Validator
      *
      * @return bool
      */
-    public function createPurchase(array $data)
+    public function validateCreatePurchase(array $data)
     {
         $rules = [
             'amount' => (!isset($data['units']) ? 'required|' : '') . '|numeric|not_in:0|min:0',
@@ -22,6 +22,22 @@ class InvestmentValidator extends Validator
         if (isset($data['amount']) && isset($data['units'])) {
             abort(400, "Requisição inválida");
         }
+
+        return $this->validate($data, $rules);
+    }
+
+    /**
+     * Function Validate create sell
+     *
+     * @param array $data
+     *
+     * @return bool
+     */
+    public function validateCreateSellInvestment(array $data)
+    {
+        $rules = [
+            'amount' => 'required|numeric|not_in:0|min:0'
+        ];
 
         return $this->validate($data, $rules);
     }
