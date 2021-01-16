@@ -8,7 +8,7 @@ class BitcoinService
     /**
      * Get values by integration api
      *
-     * @return void
+     * @return object
      */
     public function getPrice()
     {

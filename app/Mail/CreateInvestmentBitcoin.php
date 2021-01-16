@@ -7,12 +7,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class CreateDepositAccount extends Mailable implements ShouldQueue
+class CreateInvestmentBitcoin extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
     private $user;
-    private $deposit;
+    private $investment;
 
     /**
      * Create a new message instance.
@@ -21,10 +21,10 @@ class CreateDepositAccount extends Mailable implements ShouldQueue
      */
     public function __construct(
         $user,
-        $deposit
+        $investment
     ) {
-        $this->user    = $user;
-        $this->deposit = $deposit;
+        $this->user       = $user;
+        $this->investment = $investment;
 
     }
 
@@ -36,17 +36,18 @@ class CreateDepositAccount extends Mailable implements ShouldQueue
     public function build()
     {
         $objEmail = [
-            'name'          => $this->user->name,
-            'depositId'     => $this->deposit->id,
-            'depositAmount' => $this->deposit->deposit,
-            'createdAt'     => $this->deposit->created_at
+            'name'             => $this->user->name,
+            'investmentId'     => $this->investment->id,
+            'investmentAmount' => $this->investment->amount,
+            'purchasedAmount'  => $this->investment->purchased_amount,
+            'createdAt'        => $this->investment->created_at
         ];
 
         $address = env('MAIL_FROM_DEFAULT');
         $name    = env('APP_NAME');
-        $subject = 'Deposito Realizado';
+        $subject = 'Investimento Realizado';
 
-        return $this->view('email.transactions.deposit-account')
+        return $this->view('email.transactions.investment')
                     ->from($address, $name)
                     ->subject($subject)
                     ->with($objEmail);

@@ -33,6 +33,7 @@ class BankAccountRepository
         int $userId
     ) {
         $balance = $this->bankAccount->where('user_id', $userId)->sum('amount');
+
         return round($balance, 2);
     }
 
@@ -52,11 +53,11 @@ class BankAccountRepository
 
         $balance = $this->getBalance($userId);
 
-        $data = (object)[
-            'id' => $deposit->id,
-            'deposit' => $deposit->amount,
-            'balance' => $balance,
-            'created_at' => date('Y-m-d H:i:s', strtotime($deposit->created_at)),
+        $data = (object) [
+            'id'         => $deposit->id,
+            'deposit'    => $deposit->amount,
+            'balance'    => $balance,
+            'created_at' => date('Y-m-d H:i:s', strtotime($deposit->created_at))
         ];
 
         return $data;
@@ -69,13 +70,14 @@ class BankAccountRepository
      * @param float $amount
      * @param string $type
      *
-     * @return object
+     * @return BankAccount
      */
     private function createTransactionAccount(
         int    $userId,
         string $type,
         float  $amount
     ) {
+
         $account = $this->bankAccount->create([
             "user_id" => $userId,
             "type"    => $type,
@@ -83,5 +85,22 @@ class BankAccountRepository
         ]);
 
         return $account;
+    }
+
+    /**
+     * Function that debits money to create investment
+     *
+     * @param integer $userId
+     * @param float $amount
+     *
+     * @return BankAccount
+     */
+    public function investmentAccount(
+        int   $userId,
+        float $amount
+    ) {
+        $deposit = $this->createTransactionAccount($userId, 'buy_bitcoin', $amount);
+
+        return $deposit;
     }
 }
