@@ -51,4 +51,17 @@ class InvestmentRepository
         return $investment;
     }
 
+    /**
+     * Function get investments
+     *
+     * @param integer $userId
+     *
+     * @return Investment
+     */
+    public function getInvestments(int $userId){
+        $investments = $this->investment->where('user_id', $userId)->get();
+
+        return $investments;
+    }
+
 }

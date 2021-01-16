@@ -20,10 +20,10 @@ class InvestmentController extends Controller
     private $investmentValidator;
 
     public function __construct(
-        InvestmentService $investmentService,
+        InvestmentService   $investmentService,
         InvestmentValidator $investmentValidator
     ) {
-        $this->investmentService = $investmentService;
+        $this->investmentService   = $investmentService;
         $this->investmentValidator = $investmentValidator;
     }
 
@@ -38,17 +38,35 @@ class InvestmentController extends Controller
     {
         $this->investmentValidator->createPurchase($request->all());
 
-        $values = (object)[];
+        $values = (object) [];
 
-        if(isset($request->amount)){
+        if (isset($request->amount)) {
             $values->amount = $request->amount;
         }
-        if(isset($request->units)){
+        if (isset($request->units)) {
             $values->units = $request->units;
         }
 
         $investement = $this->investmentService->createPurchase($request->user, $values);
 
         return apiResponse("Valor investido.", 200, $investement);
+    }
+
+    /**
+     * Function getInvestments
+     *
+     * @param Request $request
+     *
+     * @return void
+     */
+    public function getInvestmentsPositions(Request $request)
+    {
+        try {
+            $investments = $this->investmentService->getInvestmentsPositions($request->user->id);
+
+            return apiResponse("Ok.", 200, $investments);
+        } catch (\Exception $e) {
+            throw ($e);
+        }
     }
 }

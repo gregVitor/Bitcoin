@@ -60,7 +60,7 @@ class InvestmentService
      */
     public function createPurchase(
         object $user,
-        object  $values
+        object $values
     ) {
         $balance      = $this->bankAccountRepository->getBalance($user->id);
         $bitcoinPrice = $this->bitcoinService->getPrice();
@@ -109,11 +109,49 @@ class InvestmentService
             "amount"           => $investment->applied_money,
             "purchased_amount" => $investment->bitcoin_quantity,
             "created_at"       => date('Y-m-d H:i:s', strtotime($investment->created_at)),
-            "liquidated_at"    => $investment->deleted_at != null ? date('Y-m-d H:i:s', strtotime($investment->deleted_at)) : null
+            "liquidated_at"    => null != $investment->deleted_at ? date('Y-m-d H:i:s', strtotime($investment->deleted_at)) : null
         ];
 
         $this->bankAccountRepository->investmentAccount($userId, $appliedMoney * -1);
 
         return $investmentData;
+    }
+
+    /**
+     * Function get investments
+     *
+     * @param integer $userId
+     *
+     * @return void
+     */
+    public function getInvestmentsPositions(int $userId)
+    {
+        $bitcoinPrice = $this->bitcoinService->getPrice();
+        $investments = $this->investmentRepository->getInvestments($userId);
+
+        $dataReturn = [];
+
+        foreach ($investments as $investment) {
+            $percentageAmount = ($bitcoinPrice->buy * 100) / $investment->bitcoin_price;
+
+            $data = (object) [
+                "id"                   => hashEncodeId($investment->id),
+                "applied_money"        => $investment->applied_money,
+                "purchase_price"       => $investment->bitcoin_price,
+                "bitcoin_quantity"     => $investment->bitcoin_quantity,
+                "sell_amount"          => $investment->bitcoin_quantity * $bitcoinPrice->sell,
+                "variation_amount"     => $bitcoinPrice->buy - $investment->bitcoin_price,
+                "variation_percentage" => $percentageAmount - 100,
+                "purchasedDate"        => date('Y-m-d H:i:s', strtotime($investment->created_at)),
+                "bitcoin"              => (object) [
+                    "current_price_buy"  => $bitcoinPrice->buy,
+                    "current_price_sell" => $bitcoinPrice->sell
+                ]
+            ];
+
+            $dataReturn[] = $data;
+        }
+
+        return $dataReturn;
     }
 }
