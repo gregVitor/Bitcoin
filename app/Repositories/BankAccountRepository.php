@@ -168,4 +168,25 @@ class BankAccountRepository
 
         return $arrayReturn;
     }
+
+    /**
+     * Function get bank accounts
+     *
+     * @param string $date
+     *
+     * @return void
+     */
+    public function getBankAccounts(
+        string $date = null
+    ) {
+        $bankAccounts = $this->bankAccount;
+
+        if (!empty($date)) {
+            $bankAccounts = $bankAccounts->whereDate('created_at', '=', date('Y-m-d', strtotime($date)));
+        }
+
+        $bankAccounts = $bankAccounts->get();
+
+        return $bankAccounts;
+    }
 }

@@ -36,20 +36,24 @@ class InvestmentController extends Controller
      */
     public function createPurchase(Request $request)
     {
-        $this->investmentValidator->validateCreatePurchase($request->all());
+        try {
+            $this->investmentValidator->validateCreatePurchase($request->all());
 
-        $values = (object) [];
+            $values = (object) [];
 
-        if (isset($request->amount)) {
-            $values->amount = $request->amount;
+            if (isset($request->amount)) {
+                $values->amount = $request->amount;
+            }
+            if (isset($request->units)) {
+                $values->units = $request->units;
+            }
+
+            $investement = $this->investmentService->createPurchase($request->user, $values);
+
+            return apiResponse("Valor investido.", 200, $investement);
+        } catch (\Exception $e) {
+            throw ($e);
         }
-        if (isset($request->units)) {
-            $values->units = $request->units;
-        }
-
-        $investement = $this->investmentService->createPurchase($request->user, $values);
-
-        return apiResponse("Valor investido.", 200, $investement);
     }
 
     /**
@@ -79,10 +83,31 @@ class InvestmentController extends Controller
      */
     public function createSellInvestment(Request $request)
     {
-        $this->investmentValidator->validateCreateSellInvestment($request->all());
+        try {
+            $this->investmentValidator->validateCreateSellInvestment($request->all());
 
-        $sell = $this->investmentService->sellBitcoin($request->user, $request->amount);
+            $sell = $this->investmentService->sellBitcoin($request->user, $request->amount);
 
-        return apiResponse("Ok.", 200, $sell);
+            return apiResponse("Ok.", 200, $sell);
+        } catch (\Exception $e) {
+            throw ($e);
+        }
+    }
+
+    /**
+     * Function get movements of day
+     *
+     * @return void
+     */
+    public function getMovements()
+    {
+        try {
+
+            $movements = $this->investmentService->getMovements();
+
+            return apiResponse("Ok.", 200, $movements);
+        } catch (\Exception $e) {
+            throw ($e);
+        }
     }
 }

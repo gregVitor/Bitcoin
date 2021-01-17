@@ -28,7 +28,6 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->post('deposit', 'Transactions\BankAccountController@createAccountDeposit');
             $router->get('balance', 'Transactions\BankAccountController@getBalance');
             $router->get('extract', 'Transactions\BankAccountController@getExtract');
-
         });
 
         $router->group(['prefix' => 'btc'], function () use ($router) {
@@ -39,6 +38,8 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
             $router->post('purchase', 'Transactions\InvestmentController@createPurchase');
             $router->post('sell', 'Transactions\InvestmentController@createSellInvestment');
             $router->get('position', 'Transactions\InvestmentController@getInvestmentsPositions');
+            $router->get('volume', 'Transactions\InvestmentController@getMovements');
+
         });
     });
 

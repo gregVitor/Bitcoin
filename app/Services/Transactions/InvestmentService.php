@@ -201,4 +201,21 @@ class InvestmentService
 
         return true;
     }
+
+    /**
+     * Function get investments sum investments and liquidation
+     *
+     * @return void
+     */
+    public function getMovements()
+    {
+        $investments = $this->bankAccountRepository->getBankAccounts(date('Y-m-d'));
+
+        $data = (object) [
+            'buy'  => (-1) * ($investments->where('type', 'investment')->sum('amount')),
+            'sell' => ($investments->whereIn('type', 'liquidation')->sum('amount'))
+        ];
+
+        return $data;
+    }
 }
