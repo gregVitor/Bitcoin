@@ -19,6 +19,12 @@ class InvestmentController extends Controller
      */
     private $investmentValidator;
 
+    /**
+     * Class constructor method.
+     *
+     * @param InvestmentService $investmentService
+     * @param InvestmentValidator $investmentValidator
+     */
     public function __construct(
         InvestmentService   $investmentService,
         InvestmentValidator $investmentValidator

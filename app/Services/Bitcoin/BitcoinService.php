@@ -2,8 +2,26 @@
 
 namespace App\Services\Bitcoin;
 
+use App\Repositories\HistoricBitcoinRepository;
+
 class BitcoinService
 {
+
+    /**
+     * @var HistoricBitcoinRepository
+     */
+    private $historicBitcoinRepository;
+
+    /**
+     * Class constructor method.
+     *
+     * @param HistoricBitcoinRepository $historicBitcoinRepository
+     */
+    public function __construct(
+        HistoricBitcoinRepository $historicBitcoinRepository
+    ) {
+        $this->historicBitcoinRepository = $historicBitcoinRepository;
+    }
 
     /**
      * Get values by integration api
@@ -23,5 +41,14 @@ class BitcoinService
             'sell' => (float) $data->ticker->sell,
             'date' => date('Y-m-d H:i', ($data->ticker->date))
         ];
+    }
+
+    public function createHistoryBitcoin()
+    {
+        $bitcoin = $this->getPrice();
+
+        $this->historicBitcoinRepository->createHistoryBitcoin($bitcoin->buy, $bitcoin->sell);
+
+        return true;
     }
 }

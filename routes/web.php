@@ -32,6 +32,7 @@ $router->group(['prefix' => 'api/v1'], function () use ($router) {
 
         $router->group(['prefix' => 'btc'], function () use ($router) {
             $router->get('price', 'Bitcoin\BitcoinController@getPrice');
+            $router->get('historic', 'Bitcoin\BitcoinController@getHistoricBitcoinPrice');
         });
 
         $router->group(['prefix' => 'investment'], function () use ($router) {
