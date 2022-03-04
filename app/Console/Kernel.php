@@ -13,7 +13,9 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        \App\Console\Commands\CronCreateHistoricBitcoin::class,
+        \App\Console\Commands\CronClearHistoricBitcoin::class
+
     ];
 
     /**
@@ -24,6 +26,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //
+        $schedule->command('cron:historic-bitcoin')->everyTenMinutes();
+        $schedule->command('cron:clear-historic')->dailyAt('00:01');
     }
 }

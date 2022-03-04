@@ -6,7 +6,10 @@
     "type": "project",
     "require": {
         "php": "^7.3|^8.0",
-        "laravel/lumen-framework": "^8.0"
+        "laravel/lumen-framework": "^8.0",
+        "tymon/jwt-auth": "dev-develop",
+        "vinkla/hashids": "^9.1",
+        "illuminate/mail": "^8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
@@ -18,7 +21,13 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/Hash.php",
+            "app/Helpers/Response.php",
+            "app/Helpers/Request.php"
+        ]
+
     },
     "autoload-dev": {
         "classmap": [

@@ -39,6 +39,8 @@ class Authenticate
             return response('Unauthorized.', 401);
         }
 
+        $request->user = $this->auth->user();
+
         return $next($request);
     }
 }
